@@ -1,38 +1,23 @@
-name: Autograding Tests
+name: Tests
 
 on:
   push:
   pull_request:
-  repository_dispatch:
-
-permissions:
-  checks: write
-  actions: read
-  contents: read
 
 jobs:
-  run-tests:
+  pytest:
     runs-on: ubuntu-latest
-    if: github.actor != 'github-classroom[bot]'
-
+    strategy:
+      matrix:
+        python-version: [ "3.10", "3.11" ]
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Add project root to PYTHONPATH
-        run: |
-          echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
-
-      - name: Run pytest
-        run: pytest -q
+          python-version: ${{ matrix.python-version }}
+      - name: Install pytest
+        run: pip install pytest
+      - name: Run tests
+        run: python -m pytest -q
