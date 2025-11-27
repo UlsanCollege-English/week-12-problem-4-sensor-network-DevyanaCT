@@ -1,6 +1,5 @@
+import heapq
 
-## main.py
-```python
 def prim_mst(graph, start):
     """
     Build a minimum spanning tree (MST) using a Prim-style algorithm.
@@ -13,21 +12,44 @@ def prim_mst(graph, start):
         (mst_edges, total_cost)
         - mst_edges: list of (u, v, w) edges in the MST.
         - total_cost: sum of weights w in all MST edges.
-
-    You may assume:
-        - graph is connected.
-        - start exists in graph.
     """
-    # TODO Step 1: Describe in your own words what MST means.
-    # TODO Step 2: Re-phrase this problem in a very simple sentence.
-    # TODO Step 3: Decide on data structures: visited set, edge list, mst_edges list, total_cost.
-    # TODO Step 4: Plan Prim's algorithm: how do you grow the tree from the start node?
-    # TODO Step 5: Write pseudocode for your Prim loop.
-    # TODO Step 6: Implement the code here based on your pseudocode.
-    # TODO Step 7: Test with small graphs and draw them to check the MST.
-    # TODO Step 8: Reason about the time complexity of your approach.
 
-    raise NotImplementedError("prim_mst is not implemented yet")
+    # Step 1: MST meaning (short summary)
+    # An MST is a set of edges connecting all nodes with the minimum total weight and no cycles.
+
+    # Step 2: Simple re-phrasing
+    # "Grow a cheapest possible tree that connects every node."
+
+    # Step 3: Data structures
+    visited = set()
+    mst_edges = []
+    total_cost = 0
+    pq = []  # min-heap storing (weight, u, v)
+
+    # Step 4: Start by marking the start node and pushing its edges
+    visited.add(start)
+    for (nbr, w) in graph[start]:
+        heapq.heappush(pq, (w, start, nbr))
+
+    # Step 5: Prim's loop
+    # Repeatedly pick the smallest edge that connects to an unvisited node.
+    while pq and len(visited) < len(graph):
+        w, u, v = heapq.heappop(pq)
+
+        if v in visited:
+            continue  # skip edges leading to visited nodes
+
+        # Accept this edge into the MST
+        visited.add(v)
+        mst_edges.append((u, v, w))
+        total_cost += w
+
+        # Push all edges out of v
+        for (nbr, wt) in graph[v]:
+            if nbr not in visited:
+                heapq.heappush(pq, (wt, v, nbr))
+
+    return mst_edges, total_cost
 
 
 if __name__ == "__main__":
